@@ -7,21 +7,41 @@ from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime
 from game import GameEngine, DIRECTIONS
 
-def get_lm_studio_host() -> str:
-    """Detecta automáticamente el host de LM Studio (variable de entorno, localhost o red local)."""
-    if "LM_STUDIO_HOST" in os.environ:
-        return os.environ["LM_STUDIO_HOST"].rstrip("/")
-    for candidate in ["http://localhost:1234", "http://127.0.0.1:1234", "http://192.168.1.179:1234"]:
-        try:
-            req = urllib.request.Request(f"{candidate}/v1/models")
-            with urllib.request.urlopen(req, timeout=1.5) as resp:
-                if resp.status == 200:
-                    return candidate
-        except Exception:
-            continue
-    return "http://localhost:1234"
+CURRENT_LM_STUDIO_HOST = os.environ.get("LM_STUDIO_HOST", "http://127.0.0.1:1234")
+ACTIVE_MODEL_NAME = "LM Studio"
 
-ACTIVE_MODEL_NAME = "LM Studio (Auto)"
+def get_lm_studio_host() -> str:
+    global CURRENT_LM_STUDIO_HOST
+    return CURRENT_LM_STUDIO_HOST
+
+def set_lm_studio_host(host: str) -> Dict[str, Any]:
+    global CURRENT_LM_STUDIO_HOST, ACTIVE_MODEL_NAME
+    if not host or not host.strip():
+        host = "http://127.0.0.1:1234"
+    host = host.strip()
+    if not host.startswith("http://") and not host.startswith("https://"):
+        host = f"http://{host}"
+    host = host.rstrip("/")
+    CURRENT_LM_STUDIO_HOST = host
+
+    model_detected = None
+    error_msg = None
+    try:
+        req = urllib.request.Request(f"{CURRENT_LM_STUDIO_HOST}/v1/models")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if "data" in data and len(data["data"]) > 0:
+                model_detected = data["data"][0].get("id", "LM Studio")
+                ACTIVE_MODEL_NAME = model_detected
+    except Exception as e:
+        error_msg = str(e)
+
+    return {
+        "success": model_detected is not None,
+        "host": CURRENT_LM_STUDIO_HOST,
+        "model": ACTIVE_MODEL_NAME,
+        "error": error_msg
+    }
 
 def get_active_model_name() -> str:
     global ACTIVE_MODEL_NAME

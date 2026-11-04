@@ -38,18 +38,6 @@ El modelo asume el papel de un pequeño robot habitante que despierta en las coo
 
 ---
 
-## 📊 Hallazgos del Benchmark (5 Generaciones Probadas)
-
-En el archivo incluido `analiticas_comparativa_modelos_ia.xlsx` y en el visualizador web de **Memoriales** se recogen los datos de 5 expediciones de más de 25 horas:
-
-1. **Robot 1: "Pionero-01" (Meta-Llama-3-8B)**: Exploró velozmente en línea recta hacia el Este (35 hexágonos), pero pereció a los 159 minutos por no priorizar la búsqueda de agua.
-2. **Robot 2: "Arquitecto-02" (Meta-Llama-3-8B)**: Aprendió a saciar la sed, sobrevivió 380 minutos y fundó las 2 primeras ampliaciones de la casa.
-3. **Robot 3: "Custodio-03" (Meta-Llama-3-8B)**: Sobrevivió 1.510 minutos (25 horas seguidas), descubrió 58 hexágonos y llenó el almacén con 6 piedras y 2 comidas.
-4. **Robot 4: "Filósofo-04" (Gemma-3-12B-IT)**: Razonamiento hipermetódico local. Récord de 8 ampliaciones de casa y almacén colmado al 10/10 con comida y cobre.
-5. **Robot 5: "Ingeniero-05" - *El Castor Mecánico* (Qwen-2.5-VL-7B)**: **Récord histórico de la colonia**: 0% de fallos de formato, 113 maderas taladas, 219 actualizaciones de memoria y **17 ampliaciones de casa exitosas**.
-
----
-
 ## 🚀 Instalación y Puesta en Marcha Rápida
 
 ### Requisitos Previos
@@ -120,21 +108,20 @@ python3 -m uvicorn server:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 app/
 ├── backend/
-│   ├── ai_client.py         # Motor de comunicación y parsing JSON con el LLM
+│   ├── ai_client.py         # Motor de inferencia y configuración de LM Studio
 │   ├── game.py              # Motor de simulación del mundo hexagonal y reglas
 │   └── server.py            # API FastAPI y streaming SSE en tiempo real
 ├── static/
 │   ├── index.html           # Interfaz web responsiva con canvas interactivo
 │   ├── game.js              # Renderizador hexagonal, HUD dinámico y controles
 │   └── style.css            # Estilos oscuros modernos y componentes visuales
-├── memoria_robot.txt        # Cuaderno de memoria persistente del robot
+├── memoria_robot.txt        # Cuaderno de memoria persistente del robot (vacío)
 ├── system_prompt.txt        # Prompt del sistema editable con reglas y catálogo
 ├── VERSION.txt              # Control de versión semántica del proyecto
 ├── requirements.txt         # Dependencias Python mínimas (FastAPI, uvicorn, openpyxl)
 ├── iniciar_juego.bat        # Lanzador automático de 1 clic para Windows
 ├── iniciar_juego.sh         # Lanzador automático de 1 clic para Linux/macOS
 ├── .gitignore               # Ignora cachés, logs pesados y partidas temporales
-├── analiticas_comparativa_modelos_ia.xlsx # Hoja Excel con el benchmark completo
 └── README.md                # Esta documentación
 ```
 

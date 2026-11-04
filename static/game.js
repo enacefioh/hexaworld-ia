@@ -205,27 +205,81 @@ class HexWorld {
       }
     });
 
-    // Modal de Memorial Pionero-01
-    const closeMemorialModal = () => {
-      document.getElementById("memorialModal").classList.remove("show");
+    // Modal de Configuración LM Studio
+    const closeLlmModal = () => {
+      document.getElementById("llmConfigModal")?.classList.remove("show");
     };
-    document.getElementById("btnMemorial")?.addEventListener("click", () => this.openMemorialModal());
-    document.getElementById("btnVerMemorialTab")?.addEventListener("click", () => this.openMemorialModal());
-    document.getElementById("btnCloseMemorialModal")?.addEventListener("click", closeMemorialModal);
-    document.getElementById("btnOkMemorialModal")?.addEventListener("click", closeMemorialModal);
-    document.getElementById("memorialModal")?.addEventListener("click", (e) => {
-      if (e.target.id === "memorialModal") closeMemorialModal();
+    document.getElementById("btnConfigLlm")?.addEventListener("click", () => this.openLlmConfigModal());
+    document.getElementById("modelBadge")?.addEventListener("click", () => this.openLlmConfigModal());
+    document.getElementById("btnCloseLlmConfig")?.addEventListener("click", closeLlmModal);
+    document.getElementById("btnCancelLlmConfig")?.addEventListener("click", closeLlmModal);
+    document.getElementById("btnSaveLlmConfig")?.addEventListener("click", () => this.saveLlmConfig());
+    document.getElementById("llmHostInput")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.saveLlmConfig();
+    });
+    document.getElementById("llmConfigModal")?.addEventListener("click", (e) => {
+      if (e.target.id === "llmConfigModal") closeLlmModal();
     });
   }
 
-  async openMemorialModal() {
+  openLlmConfigModal() {
+    const modal = document.getElementById("llmConfigModal");
+    if (!modal) return;
+    const input = document.getElementById("llmHostInput");
+    const status = document.getElementById("llmHostStatus");
+    const saved = localStorage.getItem("hexaworld_llm_host") || "127.0.0.1:1234";
+    if (input) input.value = saved;
+    if (status) {
+      status.style.color = "#94a3b8";
+      status.innerHTML = `💡 Por defecto <code>127.0.0.1:1234</code> si LM Studio corre en esta máquina.`;
+    }
+    modal.classList.add("show");
+    if (input) setTimeout(() => input.focus(), 150);
+  }
+
+  async saveLlmConfig() {
+    const input = document.getElementById("llmHostInput");
+    const status = document.getElementById("llmHostStatus");
+    const saveBtn = document.getElementById("btnSaveLlmConfig");
+    const rawVal = (input ? input.value : "").trim() || "127.0.0.1:1234";
+
+    if (status) {
+      status.style.color = "#38bdf8";
+      status.innerText = `⏳ Conectando con ${rawVal}...`;
+    }
+    if (saveBtn) saveBtn.disabled = true;
+
     try {
-      const res = await fetch("/api/memorial");
-      const txt = await res.text();
-      document.getElementById("memorialModalText").innerText = txt;
-      document.getElementById("memorialModal").classList.add("show");
+      const res = await fetch("/api/config/llm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ host: rawVal })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("hexaworld_llm_host", rawVal);
+        this.updateModelBadge(data.model);
+        if (status) {
+          status.style.color = "#34d399";
+          status.innerText = `✅ ¡Conectado con éxito! Modelo activo: ${data.model}`;
+        }
+        setTimeout(() => {
+          document.getElementById("llmConfigModal")?.classList.remove("show");
+          if (saveBtn) saveBtn.disabled = false;
+        }, 800);
+      } else {
+        if (status) {
+          status.style.color = "#f87171";
+          status.innerText = `❌ No se pudo conectar a ${data.host || rawVal}. Comprueba que LM Studio tiene el 'Local Server' encendido.`;
+        }
+        if (saveBtn) saveBtn.disabled = false;
+      }
     } catch (e) {
-      alert("Error cargando memorial: " + e.message);
+      if (status) {
+        status.style.color = "#f87171";
+        status.innerText = `❌ Error de red: ${e.message}`;
+      }
+      if (saveBtn) saveBtn.disabled = false;
     }
   }
 
@@ -303,6 +357,9 @@ class HexWorld {
       if (data.world_summary && data.world_summary.acciones_disponibles) {
         this.updateAccionesDisponibles(data.world_summary.acciones_disponibles);
       }
+
+      // Pedir/confirmar la dirección IP del servidor LLM (LM Studio) al arrancar
+      setTimeout(() => this.openLlmConfigModal(), 300);
     } catch (e) {
       console.error("Error cargando estado inicial:", e);
     }
@@ -632,6 +689,8 @@ class HexWorld {
       if (data.state.world_summary && data.state.world_summary.acciones_disponibles) {
         this.updateAccionesDisponibles(data.state.world_summary.acciones_disponibles);
       }
+      // Al reiniciar partida, pedir/confirmar la IP de LM Studio
+      setTimeout(() => this.openLlmConfigModal(), 300);
     } catch (e) {
       alert("Error reiniciando: " + e.message);
     }

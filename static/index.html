@@ -35,11 +35,12 @@
     </div>
 
     <div class="header-actions">
-      <button class="btn btn-secondary" id="btnMemorial" title="Memorial de Pioneros y Arquitectos">
+      <button class="btn btn-secondary" id="btnConfigLlm" title="Configurar IP / Servidor LM Studio">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
         </svg>
-        Memoriales
+        LM Studio
       </button>
 
       <button class="btn btn-secondary" id="btnOpenLog">
@@ -215,24 +216,6 @@
           </p>
           <div class="memory-box" id="archivoMemoriaText" style="border-left: 3px solid var(--accent-cyan); background: rgba(56, 189, 248, 0.05); color: #e2e8f0; font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap;">(El archivo de memoria está vacío actualmente)</div>
         </div>
-
-        <div class="card" style="border-left: 3px solid #f59e0b;">
-          <div class="card-title">
-            <span style="color: #f59e0b; display: flex; align-items: center; gap: 6px;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-              </svg>
-              Memorial de Exploradores y Constructores
-            </span>
-            <span class="tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">V1.261104.1</span>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
-            <strong>Pionero-01</strong> (159 min, 35 hexágonos) y <strong>Arquitecto-02</strong> (380 min, 42 hexágonos, 2 ampliaciones de casa con 10/10 de salud).
-          </p>
-          <button class="btn btn-secondary" id="btnVerMemorialTab" style="width: 100%; justify-content: center;">
-            Ver Memoriales y Biografías
-          </button>
-        </div>
       </div>
     </aside>
 
@@ -284,18 +267,37 @@
     </div>
   </div>
 
-  <!-- MODAL DE MEMORIAL PIONERO-01 -->
-  <div class="modal-backdrop" id="memorialModal">
-    <div class="modal-dialog" style="max-width: 650px;">
+  <!-- MODAL DE CONFIGURACIÓN LM STUDIO -->
+  <div class="modal-backdrop" id="llmConfigModal">
+    <div class="modal-dialog" style="max-width: 500px;">
       <div class="modal-header">
-        <h3 style="color: #f59e0b;">Memorial: Pionero-01</h3>
-        <button class="btn btn-secondary" id="btnCloseMemorialModal" style="padding: 4px 10px;">✕</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <h3>Conexión LM Studio</h3>
+        </div>
+        <button class="btn btn-secondary" id="btnCloseLlmConfig" style="padding: 4px 10px;">✕</button>
       </div>
-      <div class="modal-body">
-        <pre class="log-pre" id="memorialModalText" style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: #f1f5f9;"></pre>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+          Introduce la dirección IP y puerto del servidor local de inferencia <strong>LM Studio</strong>:
+        </p>
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">
+            DIRECCIÓN DEL SERVIDOR (IP:PUERTO)
+          </label>
+          <input type="text" id="llmHostInput" value="127.0.0.1:1234" placeholder="127.0.0.1:1234"
+            style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; color: #f8fafc; font-family: var(--font-mono); font-size: 0.95rem; outline: none; box-sizing: border-box;" />
+        </div>
+        <div id="llmHostStatus" style="font-size: 0.84rem; padding: 10px 12px; border-radius: 6px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); color: #94a3b8;">
+          💡 Por defecto <code>127.0.0.1:1234</code> si LM Studio corre en esta misma máquina.
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" id="btnOkMemorialModal">Cerrar</button>
+        <button class="btn btn-secondary" id="btnCancelLlmConfig">Cerrar</button>
+        <button class="btn btn-primary" id="btnSaveLlmConfig" style="background: #0284c7;">Conectar y Guardar</button>
       </div>
     </div>
   </div>
