@@ -2,6 +2,8 @@
 
 > **Un entorno de simulación y benchmark empírico donde un Modelo de Lenguaje Grande (LLM) local controla de forma autónoma a un robot colonizador en un mundo procedural con niebla de guerra, reglas de supervivencia y gestión de memoria a largo plazo.**
 
+![HexaWorld IA Screenshot](screenshot.png)
+
 ---
 
 ## 📖 ¿Qué es HexaWorld IA?
@@ -122,6 +124,7 @@ app/
 ├── iniciar_juego.bat        # Lanzador automático de 1 clic para Windows
 ├── iniciar_juego.sh         # Lanzador automático de 1 clic para Linux/macOS
 ├── .gitignore               # Ignora cachés, logs pesados y partidas temporales
+├── screenshot.png           # Captura de pantalla de la interfaz de juego
 └── README.md                # Esta documentación
 ```
 
