@@ -1,0 +1,6 @@
+# Garantizar que los scripts por lotes de Windows mantengan siempre saltos de linea CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Scripts shell de Linux / macOS con saltos de linea LF
+*.sh text eol=lf
