@@ -2,7 +2,11 @@
 
 > **Un entorno de simulación y benchmark empírico donde un Modelo de Lenguaje Grande (LLM) local controla de forma autónoma a un robot colonizador en un mundo procedural con niebla de guerra, reglas de supervivencia y gestión de memoria a largo plazo.**
 
-![HexaWorld IA Screenshot](screenshot.png)
+![HexaWorld IA Demo](demo.gif)
+
+<video src="demo.mp4" controls autoplay loop muted style="max-width: 100%; border-radius: 8px; margin-top: 8px;"></video>
+
+*Demostración acelerada (15 segundos): Evolución del robot desde la exploración inicial y supervivencia (beber/comer), pasando por la logística y almacenaje en casa, hasta un territorio colonial maduro de 24 horas.*
 
 ---
 
@@ -37,6 +41,9 @@ El modelo asume el papel de un pequeño robot habitante que despierta en las coo
 | 🏔️ **Montaña** | Piedra (69%), Cobre (20%), Hierro (10%), Diamante (1%) | Cantería y minería. Fuente de piedra para ampliar la casa. |
 | 💧 **Agua** | Agua dulce | Intransitable, pero permite ejecutar `BEBER` desde cualquier casilla adyacente para saciar la sed al 10/10. |
 | 🚧 **En Obras** | Infraestructura | Parcelas edificadas adyacentes resultantes de las ampliaciones del robot. |
+
+### 📸 Vista Completa de la Interfaz
+![HexaWorld IA Screenshot](screenshot.png)
 
 ---
 
@@ -124,6 +131,8 @@ app/
 ├── iniciar_juego.bat        # Lanzador automático de 1 clic para Windows
 ├── iniciar_juego.sh         # Lanzador automático de 1 clic para Linux/macOS
 ├── .gitignore               # Ignora cachés, logs pesados y partidas temporales
+├── demo.gif                 # Demostración animada del juego para el README (1.0 MB)
+├── demo.mp4                 # Vídeo resumen de 15 segundos en alta definición (0.9 MB)
 ├── screenshot.png           # Captura de pantalla de la interfaz de juego
 └── README.md                # Esta documentación
 ```
