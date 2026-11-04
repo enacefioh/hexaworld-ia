@@ -37,9 +37,10 @@ def set_lm_studio_host(host: str) -> Dict[str, Any]:
         error_msg = str(e)
 
     return {
-        "success": model_detected is not None,
+        "success": True,
+        "connected": model_detected is not None,
         "host": CURRENT_LM_STUDIO_HOST,
-        "model": ACTIVE_MODEL_NAME,
+        "model": ACTIVE_MODEL_NAME if model_detected else "LM Studio",
         "error": error_msg
     }
 

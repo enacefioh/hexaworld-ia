@@ -510,14 +510,19 @@ canvas#mapCanvas:active {
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(4px);
-  z-index: 100;
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
 
 .modal-backdrop.show {
-  display: flex;
+  display: flex !important;
+}
+
+#llmConfigModal {
+  z-index: 10000 !important;
 }
 
 .modal-dialog {

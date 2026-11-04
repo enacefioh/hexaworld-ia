@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mundo Hexagonal - IA Explorador</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=20261104.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
       </svg>
       <h1>HexaWorld IA</h1>
       <span class="badge" id="versionBadge" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 600;">V1.261104.5</span>
-      <span class="badge" id="modelBadge">LM Studio (Llama-3-8B)</span>
+      <span class="badge" id="modelBadge" onclick="window.openLlmConfigModal && window.openLlmConfigModal()" style="cursor: pointer;" title="Haz clic para configurar la dirección de LM Studio">LM Studio</span>
     </div>
 
     <div class="header-stats">
@@ -35,7 +35,7 @@
     </div>
 
     <div class="header-actions">
-      <button class="btn btn-secondary" id="btnConfigLlm" title="Configurar IP / Servidor LM Studio">
+      <button class="btn btn-secondary" id="btnConfigLlm" onclick="window.openLlmConfigModal && window.openLlmConfigModal()" title="Configurar IP / Servidor LM Studio" style="cursor: pointer;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"></circle>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -268,8 +268,8 @@
   </div>
 
   <!-- MODAL DE CONFIGURACIÓN LM STUDIO -->
-  <div class="modal-backdrop" id="llmConfigModal">
-    <div class="modal-dialog" style="max-width: 500px;">
+  <div class="modal-backdrop" id="llmConfigModal" style="z-index: 9999;">
+    <div class="modal-dialog" style="max-width: 520px; height: auto; max-height: 90vh;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
@@ -302,6 +302,6 @@
     </div>
   </div>
 
-  <script src="/static/game.js"></script>
+  <script src="/static/game.js?v=20261104.7"></script>
 </body>
 </html>

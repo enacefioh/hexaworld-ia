@@ -50,8 +50,11 @@ def get_llm_config():
 
 @app.post("/api/config/llm")
 async def update_llm_config(request: Request):
-    data = await request.json()
-    host = data.get("host", "http://127.0.0.1:1234")
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    host = data.get("host", "http://127.0.0.1:1234") if isinstance(data, dict) else "http://127.0.0.1:1234"
     result = set_lm_studio_host(host)
     return result
 

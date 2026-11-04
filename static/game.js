@@ -2,6 +2,31 @@
 const HEX_RADIUS = 50;
 const SQRT3 = Math.sqrt(3);
 
+// Helpers globales accesibles en cualquier momento desde el DOM
+window.openLlmConfigModal = function() {
+  const modal = document.getElementById("llmConfigModal");
+  if (!modal) return;
+  const input = document.getElementById("llmHostInput");
+  const status = document.getElementById("llmHostStatus");
+  const saved = localStorage.getItem("hexaworld_llm_host") || "127.0.0.1:1234";
+  if (input) input.value = saved;
+  if (status) {
+    status.style.color = "#94a3b8";
+    status.innerHTML = `💡 Por defecto <code>127.0.0.1:1234</code> si LM Studio corre en esta máquina.`;
+  }
+  modal.style.display = "flex";
+  modal.classList.add("show");
+  if (input) setTimeout(() => { input.focus(); input.select(); }, 150);
+};
+
+window.closeLlmConfigModal = function() {
+  const modal = document.getElementById("llmConfigModal");
+  if (modal) {
+    modal.style.display = "none";
+    modal.classList.remove("show");
+  }
+};
+
 class HexWorld {
   constructor() {
     this.canvas = document.getElementById("mapCanvas");
@@ -206,35 +231,25 @@ class HexWorld {
     });
 
     // Modal de Configuración LM Studio
-    const closeLlmModal = () => {
-      document.getElementById("llmConfigModal")?.classList.remove("show");
-    };
-    document.getElementById("btnConfigLlm")?.addEventListener("click", () => this.openLlmConfigModal());
-    document.getElementById("modelBadge")?.addEventListener("click", () => this.openLlmConfigModal());
-    document.getElementById("btnCloseLlmConfig")?.addEventListener("click", closeLlmModal);
-    document.getElementById("btnCancelLlmConfig")?.addEventListener("click", closeLlmModal);
+    document.getElementById("btnConfigLlm")?.addEventListener("click", () => window.openLlmConfigModal());
+    document.getElementById("modelBadge")?.addEventListener("click", () => window.openLlmConfigModal());
+    document.getElementById("btnCloseLlmConfig")?.addEventListener("click", () => window.closeLlmConfigModal());
+    document.getElementById("btnCancelLlmConfig")?.addEventListener("click", () => window.closeLlmConfigModal());
     document.getElementById("btnSaveLlmConfig")?.addEventListener("click", () => this.saveLlmConfig());
     document.getElementById("llmHostInput")?.addEventListener("keydown", (e) => {
       if (e.key === "Enter") this.saveLlmConfig();
     });
     document.getElementById("llmConfigModal")?.addEventListener("click", (e) => {
-      if (e.target.id === "llmConfigModal") closeLlmModal();
+      if (e.target.id === "llmConfigModal") window.closeLlmConfigModal();
     });
   }
 
   openLlmConfigModal() {
-    const modal = document.getElementById("llmConfigModal");
-    if (!modal) return;
-    const input = document.getElementById("llmHostInput");
-    const status = document.getElementById("llmHostStatus");
-    const saved = localStorage.getItem("hexaworld_llm_host") || "127.0.0.1:1234";
-    if (input) input.value = saved;
-    if (status) {
-      status.style.color = "#94a3b8";
-      status.innerHTML = `💡 Por defecto <code>127.0.0.1:1234</code> si LM Studio corre en esta máquina.`;
-    }
-    modal.classList.add("show");
-    if (input) setTimeout(() => input.focus(), 150);
+    window.openLlmConfigModal();
+  }
+
+  closeLlmConfigModal() {
+    window.closeLlmConfigModal();
   }
 
   async saveLlmConfig() {
@@ -256,23 +271,26 @@ class HexWorld {
         body: JSON.stringify({ host: rawVal })
       });
       const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("hexaworld_llm_host", rawVal);
+      localStorage.setItem("hexaworld_llm_host", rawVal);
+      if (data.connected) {
         this.updateModelBadge(data.model);
         if (status) {
           status.style.color = "#34d399";
           status.innerText = `✅ ¡Conectado con éxito! Modelo activo: ${data.model}`;
         }
         setTimeout(() => {
-          document.getElementById("llmConfigModal")?.classList.remove("show");
+          window.closeLlmConfigModal();
+          if (saveBtn) saveBtn.disabled = false;
+        }, 900);
+      } else {
+        this.updateModelBadge("LM Studio");
+        if (status) {
+          status.style.color = "#fbbf24";
+          status.innerHTML = `⚠️ Dirección guardada (<code>${data.host || rawVal}</code>), pero aún no responde.<br><small>Recuerda pulsar "Start Server" en LM Studio.</small>`;
+        }
+        setTimeout(() => {
           if (saveBtn) saveBtn.disabled = false;
         }, 800);
-      } else {
-        if (status) {
-          status.style.color = "#f87171";
-          status.innerText = `❌ No se pudo conectar a ${data.host || rawVal}. Comprueba que LM Studio tiene el 'Local Server' encendido.`;
-        }
-        if (saveBtn) saveBtn.disabled = false;
       }
     } catch (e) {
       if (status) {
@@ -468,7 +486,8 @@ class HexWorld {
     }
 
     if (this.robot.memoria_futuro) {
-      document.getElementById("memoryText").innerText = this.robot.memoria_futuro;
+      const el = document.getElementById("archivoMemoriaText");
+      if (el) el.innerText = this.robot.memoria_futuro;
     }
   }
 
@@ -1268,7 +1287,15 @@ class HexWorld {
   }
 }
 
-// Iniciar mundo cuando el DOM esté listo
-window.addEventListener("DOMContentLoaded", () => {
-  window.hexWorld = new HexWorld();
-});
+// Iniciar mundo cuando el DOM esté listo o inmediatamente si ya cargó
+function initHexWorld() {
+  if (!window.hexWorld) {
+    window.hexWorld = new HexWorld();
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initHexWorld);
+} else {
+  initHexWorld();
+}
