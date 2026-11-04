@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mundo Hexagonal - IA Explorador</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+        <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+      </svg>
+      <h1>HexaWorld IA</h1>
+      <span class="badge" id="versionBadge" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 600;">V1.261104.5</span>
+      <span class="badge" id="modelBadge">LM Studio (Llama-3-8B)</span>
+    </div>
+
+    <div class="header-stats">
+      <span id="hdrIteracion" style="display:none;">0</span>
+      <div class="stat-pill">
+        <span class="label">Vida del Robot</span>
+        <span class="value" id="hdrTiempo">0 min (0h 0m)</span>
+      </div>
+      <div class="stat-pill">
+        <span class="label">Posición</span>
+        <span class="value" id="hdrPosicion">(0, 0)</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btnMemorial" title="Memorial de Pioneros y Arquitectos">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        Memoriales
+      </button>
+
+      <button class="btn btn-secondary" id="btnOpenLog">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        Ver Log
+      </button>
+
+      <button class="btn btn-danger" id="btnReset" title="Reiniciar partida desde cero">
+        Reiniciar
+      </button>
+
+      <button class="btn btn-primary" id="btnPlay" title="Ejecuta 1 iteración (10 min)">
+        <svg id="playIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <span id="playSpinner" class="pulse-spinner" style="display:none;"></span>
+        <span id="playText">+10 min</span>
+      </button>
+
+      <button class="btn btn-primary" id="btnPlayHour" style="background: linear-gradient(135deg, #0284c7, #0369a1);" title="Avanza 1 hora consecutiva (6 iteraciones de 10 min)">
+        +1 Hora
+      </button>
+
+      <button class="btn btn-primary" id="btnPlayDay" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);" title="Avanza 1 día consecutivo (144 iteraciones de 10 min / 24h)">
+        +1 Día (24h)
+      </button>
+
+      <button class="btn btn-danger" id="btnStopAuto" style="display: none;" title="Detener avance automático">
+        ⏹ Detener
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN AREA -->
+  <main class="main-content">
+
+    <!-- CANVAS VIEWPORT -->
+    <div class="viewport-container" id="viewport">
+      <canvas id="mapCanvas"></canvas>
+
+      <!-- FLOATING ROBOT HUD -->
+      <div class="robot-hud">
+        <div class="hud-title">
+          <span>Robotito Explorador</span>
+          <span id="hudStatusDot" style="color: #22c55e;">● Activo</span>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-header">
+            <span>Vida / Energía</span>
+            <span id="lblVida">10 / 10</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-vida" id="barVida" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-header">
+            <span>Hambre</span>
+            <span id="lblHambre">5 / 10</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-hambre" id="barHambre" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-header">
+            <span>Sed</span>
+            <span id="lblSed">5 / 10</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-sed" id="barSed" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <!-- MOCHILA (MAX 3) -->
+        <div class="inventory-section">
+          <div class="inventory-title">
+            <span>Mochila del Robot</span>
+            <span id="lblInventarioCount">0 / 3</span>
+          </div>
+          <div class="inventory-slots" id="slotsInventario">
+            <div class="slot">Vacío</div>
+            <div class="slot">Vacío</div>
+            <div class="slot">Vacío</div>
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <!-- ALMACÉN CASA (MAX 10) -->
+        <div class="inventory-section">
+          <div class="inventory-title">
+            <span>Almacén de Casa (0,0)</span>
+            <span id="lblCasaCount">0 / 10</span>
+          </div>
+          <div class="inventory-slots" id="slotsCasa" style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <!-- 10 slots pequeños -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ZOOM & CENTER CONTROLS -->
+      <div class="canvas-controls">
+        <button class="canvas-btn" id="btnZoomIn" title="Acercar">+</button>
+        <button class="canvas-btn" id="btnZoomOut" title="Alejar">−</button>
+        <button class="canvas-btn" id="btnCenterRobot" title="Centrar en el robot">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <aside class="side-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" id="tabFeedBtn">Acciones en Directo</button>
+        <button class="tab-btn" id="tabMemoryBtn">Cuaderno de Memoria</button>
+      </div>
+
+      <div class="panel-content" id="tabFeedContent">
+        <div class="card">
+          <div class="card-title">
+            <span>Iteración en curso</span>
+            <span class="tag" id="liveStepTag">Esperando turno</span>
+          </div>
+          <div id="liveStepStatus" style="font-size: 0.85rem; color: var(--text-muted);">
+            Haz clic en "Siguiente Iteración" para que la IA tome decisiones minuto a minuto.
+          </div>
+        </div>
+
+        <!-- ACCIONES DISPONIBLES EN TIEMPO REAL -->
+        <div class="card" style="border-left: 3px solid #10b981; padding: 10px 14px;">
+          <div class="card-title" style="margin-bottom: 6px;">
+            <span style="color: #10b981; font-size: 0.8rem; font-weight: 600;">Acciones Disponibles Ahora</span>
+            <span class="tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Contextual</span>
+          </div>
+          <div id="accionesDisponiblesBadges" style="display: flex; flex-wrap: wrap; gap: 4px; font-family: var(--font-mono); font-size: 0.75rem;">
+            <span class="badge" style="background: rgba(255,255,255,0.06);">Cargando...</span>
+          </div>
+        </div>
+
+        <div class="feed-container" id="feedContainer">
+          <!-- Pasos de la iteración actual se insertarán aquí -->
+        </div>
+      </div>
+
+      <div class="panel-content" id="tabMemoryContent" style="display: none;">
+        <div class="card" style="border-left: 3px solid var(--accent-cyan);">
+          <div class="card-title">
+            <span style="color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Cuaderno de Memoria (memoria_robot.txt)
+            </span>
+            <span class="tag" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-cyan);">Archivo Vivo</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">
+            El robot puede escribir con <code>ACTUALIZAR_MEMORIA</code> y leer con <code>CONSULTAR_MEMORIA</code> (ambas gratuitas tras cada acción).
+          </p>
+          <div class="memory-box" id="archivoMemoriaText" style="border-left: 3px solid var(--accent-cyan); background: rgba(56, 189, 248, 0.05); color: #e2e8f0; font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap;">(El archivo de memoria está vacío actualmente)</div>
+        </div>
+
+        <div class="card" style="border-left: 3px solid #f59e0b;">
+          <div class="card-title">
+            <span style="color: #f59e0b; display: flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+              Memorial de Exploradores y Constructores
+            </span>
+            <span class="tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">V1.261104.1</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
+            <strong>Pionero-01</strong> (159 min, 35 hexágonos) y <strong>Arquitecto-02</strong> (380 min, 42 hexágonos, 2 ampliaciones de casa con 10/10 de salud).
+          </p>
+          <button class="btn btn-secondary" id="btnVerMemorialTab" style="width: 100%; justify-content: center;">
+            Ver Memoriales y Biografías
+          </button>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- MODAL DE LOGS -->
+  <div class="modal-backdrop" id="logModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Historial Completo de la Partida (LOG)</h3>
+        <button class="btn btn-secondary" id="btnCloseLog" style="padding: 4px 10px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre class="log-pre" id="logModalText">Cargando log...</pre>
+      </div>
+      <div class="modal-footer">
+        <a href="/api/log/text" target="_blank" class="btn btn-secondary">
+          Abrir log sin formato en pestaña nueva
+        </a>
+        <button class="btn btn-primary" id="btnRefreshLog">Actualizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP MODAL DE MEMORIA AL TERMINAR ITERACIÓN -->
+  <div class="modal-backdrop" id="memoryModal">
+    <div class="modal-dialog" style="max-width: 650px; height: auto; max-height: 85vh;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <h3 id="popupTitle">¡Iteración Completada! (10 min)</h3>
+        </div>
+        <button class="btn btn-secondary" id="btnCloseMemoryModal" style="padding: 4px 10px;">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <div class="card-title" style="margin-bottom: 6px;">
+            <span>Cuaderno de Memoria Personal (memoria_robot.txt)</span>
+            <span class="tag">Persistente</span>
+          </div>
+          <div class="memory-box" id="popupMemoryText" style="font-size: 0.9rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnOkMemoryModal">Continuar Jugando</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE MEMORIAL PIONERO-01 -->
+  <div class="modal-backdrop" id="memorialModal">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 style="color: #f59e0b;">Memorial: Pionero-01</h3>
+        <button class="btn btn-secondary" id="btnCloseMemorialModal" style="padding: 4px 10px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre class="log-pre" id="memorialModalText" style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem; color: #f1f5f9;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnOkMemorialModal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/game.js"></script>
+</body>
+</html>
